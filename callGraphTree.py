@@ -30,7 +30,6 @@ class TreeNode:
         self.children.append(child)     # add child to the parent
 
 def build_product_tree():
-    #root = TreeNode("Entry")   # starting point of the tree/call graph
     text_arr = []
     node_arr = []
     text2_arr = []
@@ -39,38 +38,33 @@ def build_product_tree():
 
     for i in range(len(lines)):
         counter = 0
-        if "Children of" in lines[i]:   # if a line contains "Children of" then it should be a node
-            text = re.split('<|>', str(lines[i]))   # split from "<" and ">" for getting exact API call
+        if "Children of" in lines[i]:
+            text = re.split('<|>', str(lines[i]))
             for j in range(len(lines)):
                 if text[1] in lines[j]:
                     counter += 1
                     if counter == 2:
                         break
 
-            if counter < 2:     # if a node mentioned in the callgraph file in once,
-                                # then this node is nobody's child API, so should be a root
-                text_arr.append(text[1])    # add node's value to an array, because we will search child nodes
-                                            # using comparison with this array
-                lvl1 = TreeNode(text[1])    # we use 1. index's value because, in this split operation
-                                            # API call's name in index 1
-                node_arr.append(lvl1)
-                root_arr.append(lvl1)
-                #root.add_child(lvl1)        # add node to an array, because we will search child nodes
-                                            # with this array
+            if counter < 2:
+                if not("Children of" in lines[i+1] or "Children of" in lines[i+2]):
+                    lvl1 = TreeNode(text[1])
+                    text_arr.append(text[1])
+                    node_arr.append(lvl1)
+
+                    root_arr.append(lvl1)
 
     for x in range(30):
         for s in range(len(lines)):
             for y in range(len(text_arr)):
-                if "Children of <"+text_arr[y] in lines[s]:     # if a node is in the array we previously
-                                                                # created, we can look for children in the bottom rows
+                if "Children of <"+text_arr[y] in lines[s]:
                     if (s+1) < len(lines):
                         z = s + 1
                     else:
                         break
-                    while not("Children of" in lines[z]):       # if the line we're on doesn't include 'Children of',
-                                                                # it's a child node
+                    while not("Children of" in lines[z]):
                         text2 = re.split('<|>', str(lines[z]))
-                        text2_arr.append(text2[1])              # add this node to another array for next level
+                        text2_arr.append(text2[1])
                         leaf = TreeNode(text2[1])
                         node2_arr.append(leaf)
                         node_arr[y].add_child(leaf)
@@ -87,6 +81,8 @@ def build_product_tree():
     for z in range(len(root_arr)):
         root_arr[z].print_tree()
         print("\n")
+
+    print(len(root_arr))
 
 if __name__ == '__main__':
     build_product_tree()
