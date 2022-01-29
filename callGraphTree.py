@@ -3,6 +3,7 @@ import re
 with open("cg.txt") as file:
     lines = file.readlines()
 
+
 class TreeNode:
     def __init__(self, data):   # constructor
         self.data = data
@@ -29,6 +30,7 @@ class TreeNode:
         child.parent = self
         self.children.append(child)     # add child to the parent
 
+
 def build_product_tree():
     text_arr = []
     node_arr = []
@@ -36,53 +38,78 @@ def build_product_tree():
     node2_arr = []
     root_arr = []
 
-    for i in range(len(lines)):
-        counter = 0
-        if "Children of" in lines[i]:
-            text = re.split('<|>', str(lines[i]))
-            for j in range(len(lines)):
-                if text[1] in lines[j]:
-                    counter += 1
-                    if counter == 2:
-                        break
+    with open("APICalls.txt", "a+") as file2:
+        file2.seek(0)
+        APIlines = file2.readlines()
 
-            if counter < 2:
-                if not("Children of" in lines[i+1] or "Children of" in lines[i+2]):
-                    lvl1 = TreeNode(text[1])
-                    text_arr.append(text[1])
-                    node_arr.append(lvl1)
-
-                    root_arr.append(lvl1)
-
-    for x in range(30):
-        for s in range(len(lines)):
-            for y in range(len(text_arr)):
-                if "Children of <"+text_arr[y] in lines[s]:
-                    if (s+1) < len(lines):
-                        z = s + 1
-                    else:
-                        break
-                    while not("Children of" in lines[z]):
-                        text2 = re.split('<|>', str(lines[z]))
-                        text2_arr.append(text2[1])
-                        leaf = TreeNode(text2[1])
-                        node2_arr.append(leaf)
-                        node_arr[y].add_child(leaf)
-                        if (z+1) < len(lines):
-                            z += 1
-                        else:
+        APIcount = len(APIlines)
+        for i in range(len(lines)):
+            counter = 0
+            if "Children of" in lines[i]:
+                text = re.split('<|>', str(lines[i]))
+                for j in range(len(lines)):
+                    if text[1] in lines[j]:
+                        counter += 1
+                        if counter == 2:
                             break
 
-        node_arr = node2_arr        # exchange arrays for moving the next level
-        node2_arr = []
-        text_arr = text2_arr
-        text2_arr = []
+                if counter < 2:
+                    if not("Children of" in lines[i+1] or "Children of" in lines[i+2]):
+                        containCount = 0
+                        lvl1 = TreeNode(text[1])
+                        text_arr.append(text[1])
+                        node_arr.append(lvl1)
+                        root_arr.append(lvl1)
+                        for h in range(len(APIlines)):    
+                            if (text[1] in APIlines[h]):
+                                containCount +=1
+                                break
+                        if(containCount == 0):        
+                            APIcount += 1
+                            file2.write(str(APIcount) +
+                                            " " + text[1] + "\n")
+
+        for x in range(30):
+            for s in range(len(lines)):
+                for y in range(len(text_arr)):
+                    if "Children of <"+text_arr[y] in lines[s]:
+                        if (s+1) < len(lines):
+                            z = s + 1
+                        else:
+                            break
+                        while not("Children of" in lines[z]):
+                            containCount2 = 0
+                            text2 = re.split('<|>', str(lines[z]))
+                            text2_arr.append(text2[1])
+                            leaf = TreeNode(text2[1])
+                            node2_arr.append(leaf)
+                            node_arr[y].add_child(leaf)
+                            for d in range(len(APIlines)):    
+                                if (text[1] in APIlines[d]):
+                                    containCount2 +=1
+                                    break
+                            if(containCount2 == 0):        
+                                APIcount += 1
+                                file2.write(str(APIcount) +
+                                            " " + text2[1] + "\n")
+                            if (z+1) < len(lines):
+                                z += 1
+                            else:
+                                break
+
+            node_arr = node2_arr        # exchange arrays for moving the next level
+            node2_arr = []
+            text_arr = text2_arr
+            text2_arr = []
 
     for z in range(len(root_arr)):
         root_arr[z].print_tree()
         print("\n")
 
     print(len(root_arr))
+    #file2.close()
+
 
 if __name__ == '__main__':
     build_product_tree()
+    file.close()
