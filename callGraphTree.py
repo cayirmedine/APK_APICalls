@@ -1,8 +1,12 @@
 import re
 
+from treelib import Node, Tree
+
 with open("cg.txt") as file:
     lines = file.readlines()
 
+with open("APICalls.txt") as file2:
+    APIlines = file2.readlines()
 
 class TreeNode:
     def __init__(self, data):   # constructor
@@ -20,11 +24,17 @@ class TreeNode:
 
     def print_tree(self):
         spaces = ' ' * self.get_level() * 3     # spaces for show leaf's levels
-        prefix = spaces + str(self.get_level())+" |" if self.parent else ""
-        print(prefix + self.data)
+        prefix = spaces +" |" if self.parent else ""
+
+        for z in range(len(APIlines)):
+            if self.data in APIlines[z]:
+                api = APIlines[z].split(" ")
+        print(prefix + api[0])
         if self.children:
             for child in self.children:
                 child.print_tree()
+        else: 
+            print("\n")
 
     def add_child(self, child):
         child.parent = self
@@ -54,7 +64,7 @@ def build_product_tree():
                             break
 
                 if counter < 2:
-                    if not("Children of" in lines[i+1] or "Children of" in lines[i+2]):
+                    if not(((i+1) < len(lines)) and ("Children of" in lines[i+1])):
                         containCount = 0
                         lvl1 = TreeNode(text[1])
                         text_arr.append(text[1])
@@ -85,7 +95,7 @@ def build_product_tree():
                             node2_arr.append(leaf)
                             node_arr[y].add_child(leaf)
                             for d in range(len(APIlines)):    
-                                if (text[1] in APIlines[d]):
+                                if (text2[1] in APIlines[d]):
                                     containCount2 +=1
                                     break
                             if(containCount2 == 0):        
@@ -104,10 +114,9 @@ def build_product_tree():
 
     for z in range(len(root_arr)):
         root_arr[z].print_tree()
-        print("\n")
 
     print(len(root_arr))
-    #file2.close()
+    file2.close()
 
 
 if __name__ == '__main__':
